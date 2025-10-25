@@ -1,12 +1,12 @@
-import { Button } from '@/components/ui/button';
+
 
 
 export default function Home() {
   return (
       <div>
-       <Button>
+       <p className="text-rose-500">
         Hello World
-       </Button>
+       </p>
       </div>
   )
 }
