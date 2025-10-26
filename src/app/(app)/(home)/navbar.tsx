@@ -4,7 +4,7 @@ import Link from "next/link";
 import {cn} from "@/lib/utils";
 import {Button} from "@/components/ui/button";
 import {usePathname} from "next/navigation";
-import {NavbarSidebar} from "@/app/(home)/navbar-sidebar";
+import {NavbarSidebar} from "@/app/(app)/(home)/navbar-sidebar";
 import {useState} from "react";
 import {MenuIcon} from "lucide-react";
 
@@ -45,7 +45,7 @@ export const Navbar = () => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     return (
         <nav className="h-20 flex border-b justify-between font-medium bg-white">
-            <Link href="/" className="pl-6 flex items-center">
+            <Link href="/public" className="pl-6 flex items-center">
                 <span className={cn("text-5xl font-semibold", poppins.className)}>
                     Funroad
                 </span>
