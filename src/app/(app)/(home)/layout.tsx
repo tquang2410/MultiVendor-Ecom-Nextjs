@@ -4,6 +4,7 @@ import {Navbar} from "@/app/(app)/(home)/navbar";
 import {Footer} from "@/app/(app)/(home)/footer";
 import {SearchFilters} from "@/app/(app)/(home)/search-filters";
 import {Category} from "@/payload-types";
+import {CustomCategory} from "@/app/(app)/(home)/type";
 
 
 interface Props {
@@ -21,18 +22,18 @@ const Layout = async ({children} : Props) => {
             parent: {
                 exists: false,
             }
-        }
+        },
+        sort: "name",
     });
-    const formattedData = data.docs.map((doc: Category) => ({
+    const formattedData: CustomCategory[] = data.docs.map((doc: Category) => ({
         ...doc,
         subcategories: (doc.subcategories?.docs ?? []).map(
             // Vì chúng ta đã đặt depth: 1, các subcategory sẽ được populate đầy đủ
             (doc) => ({
-            ...(doc as Category),
+            ...(doc as CustomCategory),
             subcategories: undefined, // Loại bỏ subcategories con để tránh lặp vô hạn
         }))
-    }))
-    console.log(data, formattedData);
+    }));
     return (
         <div className="flex flex-col min-h-screen">
            <Navbar />
