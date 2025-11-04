@@ -1,18 +1,24 @@
+
 import {ScrollArea} from "@/components/ui/scroll-area";
 import {Sheet, SheetHeader, SheetTitle, SheetContent} from "@/components/ui/sheet";
-import {CustomCategory} from "@/app/(app)/(home)/type";
 import {useState} from "react";
 import {ChevronLeftIcon, ChevronRightIcon} from "lucide-react";
 import {useRouter} from "next/navigation";
+import {useTRPC} from "@/trpc/client";
+import {useQuery} from "@tanstack/react-query";
+import {CategoriesGetManyOutput} from "@/modules/categories/type";
 interface Props {
     open: boolean;
     onOpenChange: (open: boolean) => void;
-    data: CustomCategory[];
 }
-export const CategoriesSidebar = ({open, onOpenChange, data}: Props) => {
+export const CategoriesSidebar = ({open, onOpenChange,}: Props) => {
+    // 2 dòng này để lấy dữ liệu categories từ trpc nếu không được truyền qua props
+    const trpc = useTRPC();
+    const {data} = useQuery(trpc.categories.getMany.queryOptions())
+
     const router = useRouter();
-    const [parentCategories, setParentCategories] = useState<CustomCategory[] | null>(null);
-    const [selectedCategory, setSelectedCategory] = useState<CustomCategory | null>(null);
+    const [parentCategories, setParentCategories] = useState<CategoriesGetManyOutput | null>(null);
+    const [selectedCategory, setSelectedCategory] = useState<CategoriesGetManyOutput[1] | null>(null);
 
     // Nếu có categories cha thì hiển thị danh sách categories cha, ngược lại hiển thị danh sách categories con của category đã chọn
     const currentCategories = parentCategories ?? data ?? [];
@@ -21,9 +27,9 @@ export const CategoriesSidebar = ({open, onOpenChange, data}: Props) => {
         setParentCategories(null);
         onOpenChange(open);
     }
-    const handleCategoryClick = (category: CustomCategory) => {
+    const handleCategoryClick = (category: CategoriesGetManyOutput[1]) => {
         if (category.subcategories && category.subcategories.length > 0) {
-            setParentCategories(category.subcategories as CustomCategory[]);
+            setParentCategories(category.subcategories as CategoriesGetManyOutput);
             setSelectedCategory(category);
         } else {
             if(parentCategories && selectedCategory) {

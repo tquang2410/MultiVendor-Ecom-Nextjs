@@ -1,14 +1,13 @@
 "use client";
-import {Category} from "@/payload-types";
 import {Button} from "@/components/ui/button";
 import {cn} from "@/lib/utils";
 import {useState, useRef} from "react";
 import {useDropdownPosition} from "@/app/(app)/(home)/search-filters/use-dropdown-position";
 import {SubcategoryMenu} from "@/app/(app)/(home)/search-filters/subcategory-menu";
-import {CustomCategory} from "@/app/(app)/(home)/type";
 import Link from "next/link";
+import {CategoriesGetManyOutput} from "@/modules/categories/type";
 interface Props {
-    category: CustomCategory;
+    category: CategoriesGetManyOutput[1];
     isActive?: boolean;
     isNavigationHovered?: boolean;
 };

@@ -1,14 +1,14 @@
 "use client";
 import {CategoryDropdown} from "@/app/(app)/(home)/search-filters/category-dropdown";
-import {CustomCategory} from "@/app/(app)/(home)/type";
 import {useEffect, useRef, useState} from "react";
 import {Button} from "@/components/ui/button";
 import {cn} from "@/lib/utils";
 import {ListFilterIcon} from "lucide-react";
 import {CategoriesSidebar} from "@/app/(app)/(home)/search-filters/categories-sidebar";
+import {CategoriesGetManyOutput} from "@/modules/categories/type";
 
 interface Props {
-    data: CustomCategory[];
+    data: CategoriesGetManyOutput;
 }
 export const Categories = ({data}: Props) => {
     const containerRef = useRef<HTMLDivElement>(null);
@@ -44,7 +44,7 @@ export const Categories = ({data}: Props) => {
     },[data.length])
     return(
         <div className="relative w-full">
-            <CategoriesSidebar open={isSidebarOpen} onOpenChange={setIsSidebarOpen} data={data}/>
+            <CategoriesSidebar open={isSidebarOpen} onOpenChange={setIsSidebarOpen}/>
             {/*Ẩn div này đi để tránh bị ảnh hưởng đến layout*/}
             <div ref={measureRef}>
                 {data.map((category) => (
