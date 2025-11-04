@@ -1,36 +1,90 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Nền tảng Thương mại điện tử Đa nhà cung cấp
 
-## Getting Started
+Đây là một dự án học tập đang trong quá trình phát triển, xây dựng một trang web **Thương mại điện tử đa nhà cung cấp (Multi-vendor E-commerce)** bằng cách sử dụng Next.js, Payload CMS, và tRPC.
 
-First, run the development server:
+Mục tiêu chính là học cách tích hợp một framework full-stack (Next.js) với một hệ thống CMS headless (Payload) và API typesafe (tRPC) để xử lý các chức năng phức tạp như sản phẩm, người dùng, giỏ hàng, và đơn hàng từ nhiều nhà bán khác nhau.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## 2. Techstack
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Dự án này sử dụng một bộ công nghệ hiện đại dựa trên TypeScript:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### ⚙️ Framework & Core
+* **Next.js:** v15 (Framework React full-stack)
+* **React:** v19 (Thư viện UI)
+* **TypeScript:** v5 (Ngôn ngữ)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 🗃️ Backend & CMS
+* **Payload CMS:** v3 (Headless CMS)
+* **Database:** MongoDB (Sử dụng qua `@payloadcms/db-mongodb`)
 
-## Learn More
+### 📡 API & Data Fetching
+* **tRPC:** v11 (Để xây dựng và sử dụng API typesafe)
+* **TanStack Query:** v5 (Quản lý state của server, caching, data fetching)
+* **GraphQL:** Dùng để truy vấn dữ liệu từ Payload.
 
-To learn more about Next.js, take a look at the following resources:
+### 🎨 Styling & UI
+* **Tailwind CSS:** v4 (Utility-first CSS framework)
+* **shadcn/ui:** (Sử dụng ngầm, dựa trên sự kết hợp của `radix-ui`, `lucide-react`, `clsx`, và `tailwind-merge`)
+* **next-themes:** Quản lý Dark/Light mode.
+* **sonner:** Thư viện thông báo (toast).
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 📝 Forms & Validation
+* **React Hook Form:** v7 (Quản lý trạng thái form)
+* **Zod:** v3 (Xác thực (validate) schema và kiểu dữ liệu)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### 🔧 Linting & Tooling
+* **ESLint:** v9 (Bộ linting tiêu chuẩn của Next.js)
+* **Type Generation:** Sử dụng `payload generate:types` để đồng bộ kiểu dữ liệu từ CMS.
 
-## Deploy on Vercel
+## Cấu trúc thư mục
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Dưới đây là mô tả về các thư mục chính trong dự án:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **`src/app`**: Thư mục chính của Next.js App Router.
+  - **`(app)`**: Nhóm route cho giao diện người dùng chính.
+    - **`(home)`**: Chứa các trang public (trang chủ, giới thiệu, liên hệ,...).
+    - **`api/trpc/[trpc]`**: Endpoint cho tRPC API.
+  - **`(payload)`**: Nhóm route cho Payload CMS, chứa trang admin và các API liên quan.
+- **`src/collections`**: Định nghĩa các "collection" của Payload CMS (tương tự như model hoặc schema cho database). Ví dụ: `Users`, `Products`, `Categories`.
+- **`src/components`**: Chứa các component React có thể tái sử dụng.
+  - **`ui`**: Các component được tạo bởi `shadcn/ui`.
+- **`src/hooks`**: Chứa các React hook tùy chỉnh.
+- **`src/lib`**: Chứa các hàm tiện ích chung.
+- **`src/modules`**: Phân chia logic nghiệp vụ thành các module nhỏ. Ví dụ, logic liên quan đến "category" được đặt trong `src/modules/category`.
+- **`src/trpc`**: Cấu hình và khởi tạo tRPC, bao gồm client, server, và router chính.
+- **`public`**: Chứa các tài sản tĩnh như hình ảnh, font chữ.
+
+## Bắt đầu
+
+Để chạy dự án này trên máy của bạn, hãy làm theo các bước sau:
+
+1.  **Clone a repository:**
+    ```bash
+    git clone <repository-url>
+    cd multivendor-ecommerce
+    ```
+
+2.  **Cài đặt dependencies:**
+    (Dự án này sử dụng `bun`, nhưng bạn cũng có thể dùng `npm` hoặc `yarn`)
+    ```bash
+    bun install
+    ```
+
+3.  **Thiết lập biến môi trường:**
+    Tạo một file `.env` ở gốc dự án và cấu hình các biến cần thiết, ví dụ như chuỗi kết nối MongoDB và secret của Payload.
+
+4.  **Chạy development server:**
+    ```bash
+    bun dev
+    ```
+    Mở [http://localhost:3000](http://localhost:3000) để xem trang web.
+
+## Các script có sẵn
+
+- `bun dev`: Chạy server development.
+- `bun build`: Build ứng dụng cho production.
+- `bun start`: Chạy server production sau khi build.
+- `bun lint`: Chạy ESLint để kiểm tra lỗi code.
+- `bun generate:types`: Tạo file type definition từ schema của Payload.
+- `bun db:fresh`: Xóa và tạo lại database (cẩn thận khi sử dụng).
+- `bun db:seed`: Chạy script để thêm dữ liệu mẫu vào database.

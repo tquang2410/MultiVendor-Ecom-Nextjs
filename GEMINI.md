@@ -13,20 +13,24 @@ Dự án này sử dụng một bộ công nghệ hiện đại dựa trên Type
 * **React:** v19 (Thư viện UI)
 * **TypeScript:** v5 (Ngôn ngữ)
 
+### 🗃️ Backend & CMS
+* **Payload CMS:** v3 (Headless CMS)
+* **Database:** MongoDB (Sử dụng qua `@payloadcms/db-mongodb`)
+
+### 📡 API & Data Fetching
+* **tRPC:** v11 (Để xây dựng và sử dụng API typesafe)
+* **TanStack Query:** v5 (Quản lý state của server, caching, data fetching)
+* **GraphQL:** Dùng để truy vấn dữ liệu từ Payload.
+
 ### 🎨 Styling & UI
 * **Tailwind CSS:** v4 (Utility-first CSS framework)
 * **shadcn/ui:** (Sử dụng ngầm, dựa trên sự kết hợp của `radix-ui`, `lucide-react`, `clsx`, và `tailwind-merge`)
 * **next-themes:** Quản lý Dark/Light mode.
 * **sonner:** Thư viện thông báo (toast).
 
-### 🗃️ Backend, CMS & Dữ liệu
-* **Payload CMS:** v3 (Headless CMS)
-* **Database:** MongoDB (Sử dụng qua `@payloadcms/db-mongodb`)
-* **GraphQL:** Dùng để truy vấn dữ liệu từ Payload.
-
 ### 📝 Forms & Validation
 * **React Hook Form:** v7 (Quản lý trạng thái form)
-* **Zod:** v4 (Xác thực (validate) schema và kiểu dữ liệu)
+* **Zod:** v3 (Xác thực (validate) schema và kiểu dữ liệu)
 
 ### 🔧 Linting & Tooling
 * **ESLint:** v9 (Bộ linting tiêu chuẩn của Next.js)

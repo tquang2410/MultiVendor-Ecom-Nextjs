@@ -1,43 +1,29 @@
-import configPromise from '@payload-config'
-import { getPayload } from 'payload'
+import { getQueryClient, trpc } from '@/trpc/server';
 import {Navbar} from "@/app/(app)/(home)/navbar";
 import {Footer} from "@/app/(app)/(home)/footer";
 import {SearchFilters} from "@/app/(app)/(home)/search-filters";
-import {Category} from "@/payload-types";
-import {CustomCategory} from "@/app/(app)/(home)/type";
-
+import { dehydrate, HydrationBoundary } from '@tanstack/react-query';
+import {Suspense} from "react";
+import {SearchFiltersLoading} from "@/app/(app)/(home)/search-filters";
 
 interface Props {
     children: React.ReactNode;
 }
 const Layout = async ({children} : Props) => {
-    const payload = await getPayload({
-        config: configPromise,
-    });
-    const data = await payload.find({
-        collection: 'categories',
-        depth: 1, // Dòng này dùng để populate các subcategories
-        pagination: false,
-        where: {
-            parent: {
-                exists: false,
-            }
-        },
-        sort: "name",
-    });
-    const formattedData: CustomCategory[] = data.docs.map((doc: Category) => ({
-        ...doc,
-        subcategories: (doc.subcategories?.docs ?? []).map(
-            // Vì chúng ta đã đặt depth: 1, các subcategory sẽ được populate đầy đủ
-            (doc) => ({
-            ...(doc as CustomCategory),
-            subcategories: undefined, // Loại bỏ subcategories con để tránh lặp vô hạn
-        }))
-    }));
+
+    const queryClient = getQueryClient();
+    void queryClient.prefetchQuery(
+        trpc.categories.getMany.queryOptions(),
+    );
     return (
         <div className="flex flex-col min-h-screen">
            <Navbar />
-            <SearchFilters data={formattedData}/>
+            <HydrationBoundary state={dehydrate(queryClient)}>
+                <Suspense fallback={<SearchFiltersLoading/>}>
+                    <SearchFilters />
+                </Suspense>
+
+            </HydrationBoundary>
             <div className="flex-1 bg-[#F4F4F0]">
                 {children}
             </div>
