@@ -49,3 +49,18 @@ Ngoài ra, các quy ước chung bao gồm:
     * Components React: `PascalCase.tsx` (ví dụ: `ProductCard.tsx`)
     * Các file khác (utilities, server actions, config): `kebab-case.ts` (ví dụ: `get-user.ts`)
 5.  **Imports:** Sắp xếp import theo thứ tự: thư viện bên ngoài (external), import nội bộ (internal/absolute), import tương đối (relative).
+
+## 4. Code Changes Summary
+
+### Feature: Authentication (`authentication` branch)
+
+*   **File Modified:** `src/modules/auth/server/procedures.ts`
+*   **Change:**
+    *   Updated the `createAccount` tRPC procedure.
+    *   Replaced `ctx.db.create` with the full Payload client (`await getPayload({ config: configPromise })`). This is to ensure Payload's built-in password hashing and user creation logic is triggered correctly.
+    *   Corrected the import for `configPromise` to be a default import (`import configPromise from '@payload-config'`).
+    *   Explicitly set `role: 'customer'` when creating a new user.
+*   **File Modified:** `src/trpc/routers/_app.ts`
+*   **Change:**
+    *   Imported `authRouter` from `@/modules/auth/server/procedures`.
+    *   Registered the `authRouter` within the main `appRouter`. This exposes the authentication-related endpoints (like `createAccount`) to the client application.
