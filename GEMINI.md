@@ -64,3 +64,24 @@ Ngoài ra, các quy ước chung bao gồm:
 *   **Change:**
     *   Imported `authRouter` from `@/modules/auth/server/procedures`.
     *   Registered the `authRouter` within the main `appRouter`. This exposes the authentication-related endpoints (like `createAccount`) to the client application.
+
+### Feature: Products (`authentication` branch)
+
+*   **File Created:** `src/collections/Products.ts`
+*   **Change:**
+    *   Defined and exported a new Payload `CollectionConfig` for `products`.
+    *   The collection includes fields for `name`, `description`, `price`, `vendor`, `category`, `images`, and `status`.
+    *   Configured relationships to the `users`, `categories`, and `media` collections.
+*   **File Modified:** `src/payload.config.ts`
+*   **Change:**
+    *   Imported the new `Products` collection.
+    *   Registered it in the `collections` array of the main Payload config, making it available to the CMS and APIs.
+*   **File Created:** `src/modules/products/server/procedures.ts`
+*   **Change:**
+    *   Created a new `productsRouter` for tRPC.
+    *   Added a `getMany` query to fetch multiple products from the database using Payload's Local API (`ctx.db.find`).
+    *   Set `depth: 1` to populate related fields like `vendor` and `images`.
+*   **File Modified:** `src/trpc/routers/_app.ts`
+*   **Change:**
+    *   Imported the new `productsRouter`.
+    *   Registered it within the main `appRouter` to expose the product-related endpoints to the client.
