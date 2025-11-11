@@ -85,3 +85,28 @@ Ngoài ra, các quy ước chung bao gồm:
 *   **Change:**
     *   Imported the new `productsRouter`.
     *   Registered it within the main `appRouter` to expose the product-related endpoints to the client.
+
+## 5. Code Rollback and Cleanup
+
+*   **Action:** Performed a `git reset --hard HEAD` to revert the working directory to the last stable commit (`88283c6`).
+*   **Reason:** To resolve a series of cascading build errors that arose from dependency conflicts and incomplete tRPC refactoring.
+*   **Impact:** All uncommitted work was discarded. This includes the implementation of the `logIn` procedure, the UI for the sign-in and sign-up forms, and all subsequent tRPC refactoring attempts. The project's dependencies were also reverted to their last committed state.
+
+---
+
+### Feature: Sign-In Page (`authentication` branch)
+
+*   **File Modified:** `src/app/(app)/sign-in/page.tsx`
+*   **Change:** Simplified the layout to a single, centered card form, removing the two-column design. This provides a more focused UI for logging in. The form logic remains a simple `console.log` for testing.
+
+### Feature: Sign-Up Page (`authentication` branch)
+
+*   **File Modified:** `src/app/(app)/sign-up/page.tsx`
+*   **Change:** Implemented a new two-column layout for the sign-up page. The left column contains the centered form card, and the right column (visible on medium screens and up) displays a decorative area with skeleton placeholders. The skeletons were updated to use `bg-background` and `border` classes for better theme adaptability.
+
+## 6. Dependency Management
+
+*   **Package Removed:** `@hookform/resolvers`
+*   **Reason:** Removed by user command, likely to diagnose or resolve dependency issues before re-installing a specific version.
+*   **Package Added:** `@hookform/resolvers@3`
+*   **Reason:** Re-installed by user command, pinning to version 3 to ensure compatibility with other dependencies like `zod` and `react-hook-form`.
