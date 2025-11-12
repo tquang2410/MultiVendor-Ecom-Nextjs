@@ -21,9 +21,16 @@ export const authRouter = createTRPCRouter({
       return { success: true }
     } catch (error: any) {
       console.error('Backend: Error in createAccount mutation:', error)
+      // Check for Payload's validation error for unique fields
+      if (error instanceof Error && error.message.includes('The following field is invalid')) {
+        throw new TRPCError({
+          code: 'CONFLICT',
+          message: 'Username or email is already taken.',
+        })
+      }
       throw new TRPCError({
         code: 'INTERNAL_SERVER_ERROR',
-        message: error.message || 'Failed to create account.',
+        message: 'Failed to create account.',
       })
     }
   }),
