@@ -46,4 +46,8 @@ export const authRouter = createTRPCRouter({
         throw new TRPCError({ code: 'UNAUTHORIZED', message: 'Invalid email or password.' })
       }
     }),
+
+  session: baseProcedure.query(({ ctx }) => {
+    return ctx.req?.user || null;
+  }),
 })

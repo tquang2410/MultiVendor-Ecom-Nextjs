@@ -4,11 +4,11 @@ import { getPayload } from 'payload'
 import configPromise from '@payload-config'
 import superjson from 'superjson'
 
-export const createTRPCContext = cache(async (opts: { req: Request }) => {
+export const createTRPCContext = cache(async (opts?: { req: Request }) => {
   const payload = await getPayload({ config: configPromise })
   return {
     db: payload,
-    req: opts.req,
+    req: opts?.req,
   }
 })
 

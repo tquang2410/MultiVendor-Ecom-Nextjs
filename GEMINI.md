@@ -18,6 +18,8 @@ This section contains specific instructions for the Gemini CLI agent to follow d
     *   Concise and direct.
     *   Follow the Conventional Commits style (e.g., `feat: <description>`, `fix: <description>`, `refactor: <description>`).
 
+3.  **Limit Modifications to Working Code:** When updating features, restrict changes to code that is already functioning perfectly. This helps maintain stability and prevents the reintroduction of bugs.
+
 ---
 
 ## 2. Techstack
@@ -126,3 +128,28 @@ Ngoài ra, các quy ước chung bao gồm:
 *   **Reason:** Removed by user command, likely to diagnose or resolve dependency issues before re-installing a specific version.
 *   **Package Added:** `@hookform/resolvers@3`
 *   **Reason:** Re-installed by user command, pinning to version 3 to ensure compatibility with other dependencies like `zod` and `react-hook-form`.
+
+### Feature: tRPC and Sign-Up Logic (`authentication` branch)
+
+*   **File Modified:** `src/trpc/init.ts`
+*   **Change:** Refactored tRPC initialization to use `react`'s `cache` for context creation and added `superjson` as the data transformer to ensure data consistency between client and server.
+
+*   **File Modified:** `src/trpc/client.tsx`
+*   **Change:** Refactored the tRPC client provider (`TRPCReactProvider`). Unified the tRPC instance by importing `trpc` from `./react` and using `trpc.Provider` and `trpc.createClient`. This resolved a critical context conflict error.
+
+*   **File Modified:** `src/trpc/react.tsx`
+*   **Change:** Ensured the file correctly creates and exports a single `trpc` instance using `createTRPCReact` for the entire application to use.
+
+*   **File Modified:** `src/trpc/query-client.ts`
+*   **Change:** Configured `superjson` for `dehydrate` and `hydrate` options in the `QueryClient`. This ensures proper serialization/deserialization for TanStack Query's caching mechanism.
+
+*   **File Modified:** `src/modules/auth/server/procedures.ts`
+*   **Change:** Implemented the `createAccount` and `logIn` tRPC procedures. `createAccount` handles new user creation with password hashing, and `logIn` handles authentication. Added robust server-side logging and error handling.
+
+*   **File Modified:** `src/app/(app)/sign-up/page.tsx`
+*   **Change:** Implemented the full client-side logic for the sign-up form.
+    *   Used `react-hook-form` and `zod` for form state management and validation.
+    *   Integrated `trpc.auth.createAccount.useMutation` to call the backend procedure.
+    *   Added `sonner` toasts for user feedback.
+    *   Fixed a critical import issue by using the correct tRPC object from `@/trpc/react`.
+    *   Added extensive `console.log` statements for debugging the data flow.
