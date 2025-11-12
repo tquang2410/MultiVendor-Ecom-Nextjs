@@ -4,7 +4,7 @@ import {Sheet, SheetHeader, SheetTitle, SheetContent} from "@/components/ui/shee
 import {useState} from "react";
 import {ChevronLeftIcon, ChevronRightIcon} from "lucide-react";
 import {useRouter} from "next/navigation";
-import {useTRPC} from "@/trpc/client";
+import { trpc } from '@/trpc/react';
 import {useQuery} from "@tanstack/react-query";
 import {CategoriesGetManyOutput} from "@/modules/categories/type";
 interface Props {
@@ -13,8 +13,7 @@ interface Props {
 }
 export const CategoriesSidebar = ({open, onOpenChange,}: Props) => {
     // 2 dòng này để lấy dữ liệu categories từ trpc nếu không được truyền qua props
-    const trpc = useTRPC();
-    const {data} = useQuery(trpc.categories.getMany.queryOptions())
+    const {data} = trpc.categories.getMany.useQuery();
 
     const router = useRouter();
     const [parentCategories, setParentCategories] = useState<CategoriesGetManyOutput | null>(null);

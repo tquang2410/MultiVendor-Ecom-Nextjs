@@ -11,6 +11,7 @@ interface Props {
     data: CategoriesGetManyOutput;
 }
 export const Categories = ({data}: Props) => {
+    console.log('Categories component received data:', data);
     const containerRef = useRef<HTMLDivElement>(null);
     const measureRef = useRef<HTMLDivElement>(null);
     const viewAllRef = useRef<HTMLDivElement>(null);
