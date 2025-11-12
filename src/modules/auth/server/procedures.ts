@@ -1,7 +1,6 @@
 import { baseProcedure, createTRPCRouter } from '@/trpc/init'
 import { z } from 'zod'
-import { getPayload } from 'payload'
-import configPromise from '@payload-config'
+import { TRPCError } from '@trpc/server'
 
 const AuthCredentialsValidator = z.object({
   email: z.string().email(),
@@ -10,21 +9,41 @@ const AuthCredentialsValidator = z.object({
 })
 
 export const authRouter = createTRPCRouter({
-  createAccount: baseProcedure
-    .input(AuthCredentialsValidator)
-    .mutation(async ({ input }) => {
-      const payload = await getPayload({ config: configPromise })
-
-      await payload.create({
+  createAccount: baseProcedure.input(AuthCredentialsValidator).mutation(async ({ ctx, input }) => {
+    console.log('Backend: createAccount procedure called with validated input:', input)
+    const { db } = ctx
+    try {
+      await db.create({
         collection: 'users',
-        data: {
-          email: input.email,
-          username: input.username,
-          password: input.password,
-          role: 'customer',
-        },
+        data: { ...input, role: 'customer' },
       })
-
+      console.log('Backend: User created successfully:', input.email)
       return { success: true }
+    } catch (error: any) {
+      console.error('Backend: Error in createAccount mutation:', error)
+      throw new TRPCError({
+        code: 'INTERNAL_SERVER_ERROR',
+        message: error.message || 'Failed to create account.',
+      })
+    }
+  }),
+
+  logIn: baseProcedure
+    .input(z.object({ email: z.string().email(), password: z.string().min(8) }))
+    .mutation(async ({ ctx, input }) => {
+      console.log('Backend: logIn procedure called with validated input:', input.email)
+      const { db, req } = ctx
+      try {
+        await db.login({
+          collection: 'users',
+          data: input,
+          req: req,
+        })
+        console.log('Backend: User logged in successfully:', input.email)
+        return { success: true }
+      } catch (err) {
+        console.error('Backend: Error in logIn mutation:', err)
+        throw new TRPCError({ code: 'UNAUTHORIZED', message: 'Invalid email or password.' })
+      }
     }),
 })

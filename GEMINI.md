@@ -4,6 +4,22 @@
 
 Mục tiêu chính là học cách tích hợp một framework full-stack (Next.js) với một hệ thống CMS headless (Payload) để xử lý các chức năng phức tạp như sản phẩm, người dùng, giỏ hàng, và đơn hàng từ nhiều nhà bán khác nhau.
 
+## Agent Instructions & Conventions
+
+This section contains specific instructions for the Gemini CLI agent to follow during development.
+
+1.  **Log All Code Changes:** After every code modification, a summary must be appended to the `## Code Changes Summary` section of this file. The summary should detail:
+    *   The feature being worked on (e.g., `### Feature: Authentication`).
+    *   The file(s) modified or created.
+    *   A brief, clear description of the change.
+
+2.  **Git Commit Message Format:** All commit messages must be:
+    *   Written in English.
+    *   Concise and direct.
+    *   Follow the Conventional Commits style (e.g., `feat: <description>`, `fix: <description>`, `refactor: <description>`).
+
+---
+
 ## 2. Techstack
 
 Dự án này sử dụng một bộ công nghệ hiện đại dựa trên TypeScript:
