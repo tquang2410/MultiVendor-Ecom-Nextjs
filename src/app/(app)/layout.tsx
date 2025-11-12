@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { DM_Sans} from "next/font/google";
 import "./globals.css";
 import { TRPCReactProvider } from '@/trpc/client'
+import { Toaster } from 'sonner'
 
 const dmSans = DM_Sans({
     subsets: ["latin"],
@@ -26,7 +27,7 @@ export default function RootLayout({
       <TRPCReactProvider >
           {children}
       </TRPCReactProvider>
-
+      <Toaster richColors />
       </body>
     </html>
   );

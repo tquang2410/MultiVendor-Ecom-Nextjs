@@ -48,18 +48,15 @@ export default function Page() {
 
   const { mutate, isPending } = trpc.auth.createAccount.useMutation({
     onSuccess: () => {
-      console.log('Frontend: Mutation successful, redirecting...')
       toast.success('Account created! Please log in.')
       router.push('/sign-in')
     },
     onError: (err) => {
-      console.error('Frontend: Mutation failed:', err)
       toast.error(err.message)
     },
   })
 
   const onSubmit = (data: FormValues) => {
-    console.log('Frontend: Submitting form with data:', data)
     mutate(data)
   }
 
@@ -84,10 +81,6 @@ export default function Page() {
                         <Input
                           placeholder="you@example.com"
                           {...field}
-                          onChange={(e) => {
-                            console.log('Frontend: Email input value:', e.target.value)
-                            field.onChange(e)
-                          }}
                         />
                       </FormControl>
                       <FormMessage />
