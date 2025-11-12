@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 import { DM_Sans} from "next/font/google";
 import "./globals.css";
-import {TRPCProvider, TRPCReactProvider} from "@/trpc/client";
+import { TRPCReactProvider } from '@/trpc/client'
 
 const dmSans = DM_Sans({
     subsets: ["latin"],
