@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import { Spinner } from '@/components/ui/spinner' // << IMPORT MỚI
 import {
   Card,
   CardHeader,
@@ -27,11 +28,18 @@ import {
 import { Skeleton } from '@/components/ui/skeleton'
 import Link from 'next/link'
 
-const FormSchema = z.object({
-  email: z.string().email(),
-  username: z.string().min(3),
-  password: z.string().min(8),
-})
+// 👇 FIX: Cập nhật Zod schema với `refine`
+const FormSchema = z
+  .object({
+    email: z.string().email(),
+    username: z.string().min(3),
+    password: z.string().min(8, 'Password must be at least 8 characters long'),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: 'Passwords do not match',
+    path: ['confirmPassword'], // Hiển thị lỗi ở trường confirmPassword
+  })
 
 type FormValues = z.infer<typeof FormSchema>
 
@@ -43,6 +51,7 @@ export default function Page() {
       email: '',
       username: '',
       password: '',
+      confirmPassword: '', // << THÊM DEFAULT VALUE
     },
   })
 
@@ -51,13 +60,21 @@ export default function Page() {
       toast.success('Account created! Please log in.')
       router.push('/sign-in')
     },
+    // 👇 FIX: Cập nhật logic onError
     onError: (err) => {
-      toast.error(err.message)
+      if (err.data?.code === 'CONFLICT') {
+        toast.error('Email hoặc username đã tồn tại.')
+      } else {
+        toast.error('Đã có lỗi xảy ra. Vui lòng thử lại.')
+      }
     },
   })
 
+  // 👇 FIX: Cập nhật onSubmit để lọc bỏ `confirmPassword`
   const onSubmit = (data: FormValues) => {
-    mutate(data)
+    // Chỉ gửi những gì backend cần
+    const { confirmPassword, ...serverData } = data
+    mutate(serverData)
   }
 
   return (
@@ -79,6 +96,7 @@ export default function Page() {
                       <FormLabel>Email</FormLabel>
                       <FormControl>
                         <Input
+                          type="email" // << FIX: Thêm type
                           placeholder="you@example.com"
                           {...field}
                         />
@@ -113,8 +131,23 @@ export default function Page() {
                     </FormItem>
                   )}
                 />
+                {/* 👇 MỚI: Thêm field "Confirm Password" */}
+                <FormField
+                  control={form.control}
+                  name="confirmPassword"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Confirm Password</FormLabel>
+                      <FormControl>
+                        <Input type="password" placeholder="********" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                {/* 👇 FIX: Thêm Spinner */}
                 <Button type="submit" className="w-full" disabled={isPending}>
-                  Create Account
+                  {isPending ? <Spinner /> : 'Create Account'}
                 </Button>
               </form>
             </Form>
