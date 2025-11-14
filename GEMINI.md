@@ -3,7 +3,7 @@
 Đây là một dự án học tập đang trong quá trình phát triển, xây dựng một trang web **Thương mại điện tử đa nhà cung cấp (Multi-vendor E-commerce)**.
 
 Mục tiêu chính là học cách tích hợp một framework full-stack (Next.js) với một hệ thống CMS headless (Payload) để xử lý các chức năng phức tạp như sản phẩm, người dùng, giỏ hàng, và đơn hàng từ nhiều nhà bán khác nhau.
-
+Giao diện sẽ luôn có responsive để cả người dùng máy tính và mobile đều dễ dàng sử dụng.
 ## Agent Instructions & Conventions
 
 This section contains specific instructions for the Gemini CLI agent to follow during development.
@@ -19,7 +19,8 @@ This section contains specific instructions for the Gemini CLI agent to follow d
     *   Follow the Conventional Commits style (e.g., `feat: <description>`, `fix: <description>`, `refactor: <description>`).
 
 3.  **Limit Modifications to Working Code:** When updating features, restrict changes to code that is already functioning perfectly. This helps maintain stability and prevents the reintroduction of bugs.
-
+4. Bạn đã có kinh nghiệm làm leader rồi, nên nếu fix bug thì sẽ không lặp đi lặp lại một cách cũ, bạn sẽ luôn thay đổi tư duy để project hoạt động tốt dù cách fix bug khiến mục tiêu của task chưa hoàn hảo như kì vọng ban đầu.
+5. Khi thực hiện một tính năng, phải luôn vào folder PRD và đọc file markdown tương ứng. Nếu trong quá trình hoàn thành tính năng mà có chút thay đổi so với mục tiêu ban đầu của file PRD thì hãy update vào file markdown tương ứng đó.
 ---
 
 ## 2. Techstack
@@ -122,34 +123,63 @@ Ngoài ra, các quy ước chung bao gồm:
 *   **File Modified:** `src/app/(app)/sign-up/page.tsx`
 *   **Change:** Implemented a new two-column layout for the sign-up page. The left column contains the centered form card, and the right column (visible on medium screens and up) displays a decorative area with skeleton placeholders. The skeletons were updated to use `bg-background` and `border` classes for better theme adaptability.
 
-## 6. Dependency Management
-
-*   **Package Removed:** `@hookform/resolvers`
-*   **Reason:** Removed by user command, likely to diagnose or resolve dependency issues before re-installing a specific version.
-*   **Package Added:** `@hookform/resolvers@3`
-*   **Reason:** Re-installed by user command, pinning to version 3 to ensure compatibility with other dependencies like `zod` and `react-hook-form`.
-
 ### Feature: tRPC and Sign-Up Logic (`authentication` branch)
 
 *   **File Modified:** `src/trpc/init.ts`
-*   **Change:** Refactored tRPC initialization to use `react`'s `cache` for context creation and added `superjson` as the data transformer to ensure data consistency between client and server.
-
+    *   **Change:** Simplified the `baseProcedure` middleware to its most basic form (`t.procedure`). The previous middleware was redundant and potentially inefficient, calling `getPayload` a second time.
 *   **File Modified:** `src/trpc/client.tsx`
-*   **Change:** Refactored the tRPC client provider (`TRPCReactProvider`). Unified the tRPC instance by importing `trpc` from `./react` and using `trpc.Provider` and `trpc.createClient`. This resolved a critical context conflict error.
-
-*   **File Modified:** `src/trpc/react.tsx`
-*   **Change:** Ensured the file correctly creates and exports a single `trpc` instance using `createTRPCReact` for the entire application to use.
-
+    *   **Change:** Reverted the tRPC client setup to use `createTRPCContext` for `TRPCProvider` and `useTRPC`, and `createTRPCClient` for the client instance. This was a user-requested change to revert to a previous working state.
+*   **File Created:** `src/trpc/react.tsx`
+    *   **Change:** Re-created this file after it was deleted, to export the `trpc` object using `createTRPCReact`. This was part of restoring the preferred tRPC client setup.
 *   **File Modified:** `src/trpc/query-client.ts`
-*   **Change:** Configured `superjson` for `dehydrate` and `hydrate` options in the `QueryClient`. This ensures proper serialization/deserialization for TanStack Query's caching mechanism.
+    *   **Change:** Configured `superjson` for `dehydrate` and `hydrate` options in the `QueryClient`. This ensures proper serialization/deserialization for TanStack Query's caching mechanism.
+
+### Feature: Authentication (`sign-up` and `sign-in` pages, continued)
 
 *   **File Modified:** `src/modules/auth/server/procedures.ts`
-*   **Change:** Implemented the `createAccount` and `logIn` tRPC procedures. `createAccount` handles new user creation with password hashing, and `logIn` handles authentication. Added robust server-side logging and error handling.
+    *   **Change:** Added a `session` query procedure to the `authRouter` to check user login status.
+    *   **Change:** Refined error handling in the `createAccount` mutation to specifically detect Payload `ValidationError` for duplicate fields (checking `error.message.includes('The following field is invalid')`) and throw a `TRPCError` with `CONFLICT` code.
+*   **File Modified:** `src/app/(app)/sign-up/page.tsx`
+    *   **Change:** Updated tRPC import and usage to align with the restored `trpc` object from `@/trpc/react`.
+    *   **Change:** Modified the `onError` handler to provide more specific toast messages based on tRPC error codes (`CONFLICT`, `BAD_REQUEST`, or generic fallback).
+    *   **Change:** Removed all `console.log` statements from the frontend component for cleaner user experience.
+*   **File Modified:** `src/app/(app)/sign-in/page.tsx`
+    *   **Change:** Updated tRPC import and usage to align with the restored `trpc` object from `@/trpc/react`.
+*   **File Modified:** `src/app/(app)/(home)/page.tsx`
+    *   **Change:** Updated tRPC import and usage to align with the restored `trpc` object from `@/trpc/react`.
+    *   **Change:** Modified to use `trpc.auth.session.useQuery()` to fetch and display user session data.
+
+### Feature: Categories Display
+
+*   **File Modified:** `src/app/(app)/(home)/search-filters/index.tsx`
+    *   **Change:** Updated tRPC import and usage to align with the restored `trpc` object from `@/trpc/react`.
+    *   **Change:** Corrected the destructuring of `useSuspenseQuery` from `const { data } = ...` to `const data = ...` as `useSuspenseQuery` returns the data directly.
+*   **File Modified:** `src/app/(app)/(home)/search-filters/categories-sidebar.tsx`
+    *   **Change:** Updated tRPC import and usage to align with the restored `trpc` object from `@/trpc/react`.
+
+### Feature: UI/UX Enhancements
+
+*   **File Modified:** `src/app/(app)/layout.tsx`
+    *   **Change:** Added the `<Toaster richColors />` component from `sonner` to the root layout to enable visual toast notifications.
+
+### Dependency Management
+
+*   **Action:** Installed `sonner` using `npm i sonner --legacy-peer-deps` to resolve peer dependency conflicts with `date-fns` and `react-day-picker`.
+*   **Action:** Reinstalled `@trpc/react-query` using `npm i @trpc/react-query --legacy-peer-deps` after it was inadvertently removed during previous `npm` operations.
+
+### Feature: Authentication (`authentication` branch)
+
+*   **File Modified:** `src/app/(app)/sign-in/page.tsx`
+*   **Change:**
+    *   Hoàn thiện flow Đăng nhập (PRD `AUTH-02`).
+    *   Thêm `type="email"` vào Input Email (Fix `AC-1.1`).
+    *   Thêm `Spinner` vào nút "Log In" khi `isPending` (Fix `AC-3.2`).
+    *   Cập nhật `onError` để xử lý lỗi `UNAUTHORIZED` và hiển thị thông báo "Email hoặc mật khẩu không chính xác." (Fix `AC-3.4`).
 
 *   **File Modified:** `src/app/(app)/sign-up/page.tsx`
-*   **Change:** Implemented the full client-side logic for the sign-up form.
-    *   Used `react-hook-form` and `zod` for form state management and validation.
-    *   Integrated `trpc.auth.createAccount.useMutation` to call the backend procedure.
-    *   Added `sonner` toasts for user feedback.
-    *   Fixed a critical import issue by using the correct tRPC object from `@/trpc/react`.
-    *   Added extensive `console.log` statements for debugging the data flow.
+*   **Change:**
+    *   Thêm trường `confirmPassword` vào form.
+    *   Sử dụng Zod `.refine()` để validate `password === confirmPassword`.
+    *   Thêm `Spinner` vào nút "Create Account" khi `isPending`.
+    *   Cập nhật `onError` để xử lý lỗi `CONFLICT` (trùng email/username) và hiển thị thông báo chuẩn hóa.
+    *   Thêm `type="email"` vào Input Email.

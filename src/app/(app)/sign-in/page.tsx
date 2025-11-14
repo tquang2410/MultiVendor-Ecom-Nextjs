@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import { Spinner } from '@/components/ui/spinner' // << IMPORT MỚI
 import {
   Card,
   CardHeader,
@@ -49,8 +50,13 @@ export default function Page() {
       router.push('/')
       router.refresh() // Important: to make the server recognize the cookie
     },
+    // 👇 FIX AC-3.4: Cập nhật logic onError
     onError: (err) => {
-      toast.error(err.message)
+      if (err.data?.code === 'UNAUTHORIZED') {
+        toast.error('Email hoặc mật khẩu không chính xác.')
+      } else {
+        toast.error('Đã có lỗi xảy ra. Vui lòng thử lại.')
+      }
     },
   })
 
@@ -75,7 +81,12 @@ export default function Page() {
                   <FormItem>
                     <FormLabel>Email</FormLabel>
                     <FormControl>
-                      <Input placeholder="you@example.com" {...field} />
+                      {/* 👇 FIX AC-1.1: Thêm type="email" */}
+                      <Input
+                        type="email"
+                        placeholder="you@example.com"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -94,8 +105,9 @@ export default function Page() {
                   </FormItem>
                 )}
               />
+              {/* 👇 FIX AC-3.2: Thêm Spinner */}
               <Button type="submit" className="w-full" disabled={isPending}>
-                Log In
+                {isPending ? <Spinner aria-label="Đang đăng nhập..." /> : 'Log In'}
               </Button>
             </form>
           </Form>
