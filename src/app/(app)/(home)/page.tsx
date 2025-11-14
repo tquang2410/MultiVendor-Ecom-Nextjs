@@ -1,12 +1,24 @@
-"use client";
+import { Suspense } from 'react' // << IMPORT MỚI
+import { Hero } from './_components/hero'
+import { SearchFilters } from './search-filters'
+import { FeaturedProducts } from './_components/featured-products' // << IMPORT MỚI
+import { FeaturedProductsSkeleton } from './_components/featured-products-skeleton' // << IMPORT MỚI
 
-import { trpc } from "@/trpc/react";
-
-export default function Home() {
-    const { data: user } = trpc.auth.session.useQuery();
+export default function Page() {
   return (
-   <div>
-       <pre>{JSON.stringify(user, null, 2)}</pre>
-   </div>
+    <div className="flex flex-col gap-12">
+      <Hero />
+      <SearchFilters />
+
+      {/* 👇 KHỐI MỚI (AC-2.4) */}
+      <section className="space-y-6">
+        <h2 className="text-2xl font-bold tracking-tight">
+          Sản phẩm Mới nhất
+        </h2>
+        <Suspense fallback={<FeaturedProductsSkeleton />}>
+          <FeaturedProducts />
+        </Suspense>
+      </section>
+    </div>
   )
 }
