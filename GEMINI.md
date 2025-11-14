@@ -73,102 +73,6 @@ Ngoài ra, các quy ước chung bao gồm:
 
 ### Feature: Authentication (`authentication` branch)
 
-*   **File Modified:** `src/modules/auth/server/procedures.ts`
-*   **Change:**
-    *   Updated the `createAccount` tRPC procedure.
-    *   Replaced `ctx.db.create` with the full Payload client (`await getPayload({ config: configPromise })`). This is to ensure Payload's built-in password hashing and user creation logic is triggered correctly.
-    *   Corrected the import for `configPromise` to be a default import (`import configPromise from '@payload-config'`).
-    *   Explicitly set `role: 'customer'` when creating a new user.
-*   **File Modified:** `src/trpc/routers/_app.ts`
-*   **Change:**
-    *   Imported `authRouter` from `@/modules/auth/server/procedures`.
-    *   Registered the `authRouter` within the main `appRouter`. This exposes the authentication-related endpoints (like `createAccount`) to the client application.
-
-### Feature: Products (`authentication` branch)
-
-*   **File Created:** `src/collections/Products.ts`
-*   **Change:**
-    *   Defined and exported a new Payload `CollectionConfig` for `products`.
-    *   The collection includes fields for `name`, `description`, `price`, `vendor`, `category`, `images`, and `status`.
-    *   Configured relationships to the `users`, `categories`, and `media` collections.
-*   **File Modified:** `src/payload.config.ts`
-*   **Change:**
-    *   Imported the new `Products` collection.
-    *   Registered it in the `collections` array of the main Payload config, making it available to the CMS and APIs.
-*   **File Created:** `src/modules/products/server/procedures.ts`
-*   **Change:**
-    *   Created a new `productsRouter` for tRPC.
-    *   Added a `getMany` query to fetch multiple products from the database using Payload's Local API (`ctx.db.find`).
-    *   Set `depth: 1` to populate related fields like `vendor` and `images`.
-*   **File Modified:** `src/trpc/routers/_app.ts`
-*   **Change:**
-    *   Imported the new `productsRouter`.
-    *   Registered it within the main `appRouter` to expose the product-related endpoints to the client.
-
-## 5. Code Rollback and Cleanup
-
-*   **Action:** Performed a `git reset --hard HEAD` to revert the working directory to the last stable commit (`88283c6`).
-*   **Reason:** To resolve a series of cascading build errors that arose from dependency conflicts and incomplete tRPC refactoring.
-*   **Impact:** All uncommitted work was discarded. This includes the implementation of the `logIn` procedure, the UI for the sign-in and sign-up forms, and all subsequent tRPC refactoring attempts. The project's dependencies were also reverted to their last committed state.
-
----
-
-### Feature: Sign-In Page (`authentication` branch)
-
-*   **File Modified:** `src/app/(app)/sign-in/page.tsx`
-*   **Change:** Simplified the layout to a single, centered card form, removing the two-column design. This provides a more focused UI for logging in. The form logic remains a simple `console.log` for testing.
-
-### Feature: Sign-Up Page (`authentication` branch)
-
-*   **File Modified:** `src/app/(app)/sign-up/page.tsx`
-*   **Change:** Implemented a new two-column layout for the sign-up page. The left column contains the centered form card, and the right column (visible on medium screens and up) displays a decorative area with skeleton placeholders. The skeletons were updated to use `bg-background` and `border` classes for better theme adaptability.
-
-### Feature: tRPC and Sign-Up Logic (`authentication` branch)
-
-*   **File Modified:** `src/trpc/init.ts`
-    *   **Change:** Simplified the `baseProcedure` middleware to its most basic form (`t.procedure`). The previous middleware was redundant and potentially inefficient, calling `getPayload` a second time.
-*   **File Modified:** `src/trpc/client.tsx`
-    *   **Change:** Reverted the tRPC client setup to use `createTRPCContext` for `TRPCProvider` and `useTRPC`, and `createTRPCClient` for the client instance. This was a user-requested change to revert to a previous working state.
-*   **File Created:** `src/trpc/react.tsx`
-    *   **Change:** Re-created this file after it was deleted, to export the `trpc` object using `createTRPCReact`. This was part of restoring the preferred tRPC client setup.
-*   **File Modified:** `src/trpc/query-client.ts`
-    *   **Change:** Configured `superjson` for `dehydrate` and `hydrate` options in the `QueryClient`. This ensures proper serialization/deserialization for TanStack Query's caching mechanism.
-
-### Feature: Authentication (`sign-up` and `sign-in` pages, continued)
-
-*   **File Modified:** `src/modules/auth/server/procedures.ts`
-    *   **Change:** Added a `session` query procedure to the `authRouter` to check user login status.
-    *   **Change:** Refined error handling in the `createAccount` mutation to specifically detect Payload `ValidationError` for duplicate fields (checking `error.message.includes('The following field is invalid')`) and throw a `TRPCError` with `CONFLICT` code.
-*   **File Modified:** `src/app/(app)/sign-up/page.tsx`
-    *   **Change:** Updated tRPC import and usage to align with the restored `trpc` object from `@/trpc/react`.
-    *   **Change:** Modified the `onError` handler to provide more specific toast messages based on tRPC error codes (`CONFLICT`, `BAD_REQUEST`, or generic fallback).
-    *   **Change:** Removed all `console.log` statements from the frontend component for cleaner user experience.
-*   **File Modified:** `src/app/(app)/sign-in/page.tsx`
-    *   **Change:** Updated tRPC import and usage to align with the restored `trpc` object from `@/trpc/react`.
-*   **File Modified:** `src/app/(app)/(home)/page.tsx`
-    *   **Change:** Updated tRPC import and usage to align with the restored `trpc` object from `@/trpc/react`.
-    *   **Change:** Modified to use `trpc.auth.session.useQuery()` to fetch and display user session data.
-
-### Feature: Categories Display
-
-*   **File Modified:** `src/app/(app)/(home)/search-filters/index.tsx`
-    *   **Change:** Updated tRPC import and usage to align with the restored `trpc` object from `@/trpc/react`.
-    *   **Change:** Corrected the destructuring of `useSuspenseQuery` from `const { data } = ...` to `const data = ...` as `useSuspenseQuery` returns the data directly.
-*   **File Modified:** `src/app/(app)/(home)/search-filters/categories-sidebar.tsx`
-    *   **Change:** Updated tRPC import and usage to align with the restored `trpc` object from `@/trpc/react`.
-
-### Feature: UI/UX Enhancements
-
-*   **File Modified:** `src/app/(app)/layout.tsx`
-    *   **Change:** Added the `<Toaster richColors />` component from `sonner` to the root layout to enable visual toast notifications.
-
-### Dependency Management
-
-*   **Action:** Installed `sonner` using `npm i sonner --legacy-peer-deps` to resolve peer dependency conflicts with `date-fns` and `react-day-picker`.
-*   **Action:** Reinstalled `@trpc/react-query` using `npm i @trpc/react-query --legacy-peer-deps` after it was inadvertently removed during previous `npm` operations.
-
-### Feature: Authentication (`authentication` branch)
-
 *   **File Modified:** `src/app/(app)/sign-in/page.tsx`
 *   **Change:**
     *   Hoàn thiện flow Đăng nhập (PRD `AUTH-02`).
@@ -183,3 +87,9 @@ Ngoài ra, các quy ước chung bao gồm:
     *   Thêm `Spinner` vào nút "Create Account" khi `isPending`.
     *   Cập nhật `onError` để xử lý lỗi `CONFLICT` (trùng email/username) và hiển thị thông báo chuẩn hóa.
     *   Thêm `type="email"` vào Input Email.
+### Feature: Featured Products (HOME-01)
+
+*   **File Modified:** `src/modules/products/server/procedures.ts`
+    *   **Change:** Created a new tRPC query procedure `getNewest` (renamed from `getFeatured` for clarity) to fetch 8 newest products from the `products` collection, sorted by `createdAt` and with `depth: 1` for images. This fulfills AC-1.1 to AC-1.5 of the PRD.
+*   **File Modified:** `src/trpc/routers/_app.ts`
+    *   **Change:** Confirmed (and re-overwrote) that `productsRouter` is correctly imported and registered in the main `appRouter`, making the new `getNewest` procedure available.
