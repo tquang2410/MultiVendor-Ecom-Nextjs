@@ -1,34 +1,15 @@
-import { getQueryClient, trpc } from '@/trpc/server';
-import {Navbar} from "@/app/(app)/(home)/navbar";
-import {Footer} from "@/app/(app)/(home)/footer";
-import {SearchFilters} from "@/app/(app)/(home)/search-filters";
-import { dehydrate, HydrationBoundary } from '@tanstack/react-query';
-import {Suspense} from "react";
-import {SearchFiltersLoading} from "@/app/(app)/(home)/search-filters";
+import { Footer } from './footer'
+import { Navbar } from './navbar'
 
-interface Props {
-    children: React.ReactNode;
+/**
+ * Đây là Server Component (RSC) Layout.
+ */
+export default function Layout({ children }: React.PropsWithChildren) {
+  return (
+    <div className="flex flex-col min-h-screen">
+      <Navbar />
+      <main className="container flex-1 py-8">{children}</main>
+      <Footer />
+    </div>
+  )
 }
-const Layout = async ({children} : Props) => {
-
-    const queryClient = getQueryClient();
-    void queryClient.prefetchQuery(
-        trpc.categories.getMany.queryOptions(),
-    );
-    return (
-        <div className="flex flex-col min-h-screen">
-           <Navbar />
-            <HydrationBoundary state={dehydrate(queryClient)}>
-                <Suspense fallback={<SearchFiltersLoading/>}>
-                    <SearchFilters />
-                </Suspense>
-
-            </HydrationBoundary>
-            <div className="flex-1 bg-[#F4F4F0]">
-                {children}
-            </div>
-            <Footer/>
-        </div>
-    )
-}
-export default Layout;
